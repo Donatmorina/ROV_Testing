@@ -1,0 +1,294 @@
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f0f0f0; }
+#container { display: flex; width: 100vw; height: 100vh; }
+#controls-panel {
+    width: 350px;
+    padding: 15px;
+    background-color: #fff;
+    overflow-y: auto;
+    border-right: 1px solid #ccc;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: width 0.3s ease, padding 0.3s ease;
+    flex-shrink: 0;
+}
+#controls-panel.hidden {
+    width: 0;
+    padding: 0 15px;
+    border-right: none;
+    overflow: hidden;
+}
+#controls-panel.hidden > :not(#toggleControlsBtn) {
+    display: none;
+}
+#toggleControlsBtn {
+    width: 100%;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+    position: static !important;
+    left: auto !important;
+    bottom: auto !important;
+    top: auto !important;
+    z-index: 110;
+    border-radius: 4px;
+    box-shadow: none;
+}
+#controls-panel.hidden #toggleControlsBtn {
+    position: fixed !important;
+    left: 16px !important;
+    bottom: 16px !important;
+    top: auto !important;
+    width: auto !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    z-index: 2000 !important;
+}
+#scene-container { flex-grow: 1; position: relative; }
+canvas { display: block; }
+h3, h4 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+.control-group { margin-bottom: 15px; }
+.collapsible {
+    background-color: #f1f1f1;
+    cursor: pointer;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    border-bottom: 1px solid #ddd;
+}
+.collapsible:after {
+    content: '\002B';
+    color: #777;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+.collapsible.active:after {
+    content: "\2212";
+}
+.collapsible-content {
+    padding: 15px;
+    display: none;
+    overflow: hidden;
+    background-color: white;
+    border: 1px solid #eee;
+    border-top: none;
+}
+button {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 2px;
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 500;
+    border-radius: 4px;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border 0.15s;
+    outline: none;
+}
+button:hover:not(:disabled) {
+    background: #1e40af;
+}
+button:active:not(:disabled) {
+    background: #1e293b;
+}
+button:disabled {
+    background: #f3f4f6;
+    color: #a1a1aa;
+    cursor: not-allowed;
+}
+button.active {
+    background: #1e293b;
+    color: #fff;
+    border-bottom: 2px solid #38bdf8;
+}
+.list-container { max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px; background: #fafafa; border-radius: 4px; }
+.list-item { display: flex; justify-content: space-between; align-items: center; padding: 4px; border-bottom: 1px solid #eee; font-size: 0.9em; }
+.list-item:last-child { border-bottom: none; }
+.list-item.highlighted { background-color: #e0f7fa; }
+.del-btn, #clearBtn {
+    background: #dc2626;
+    color: #fff;
+    font-weight: 600;
+}
+.del-btn:hover:not(:disabled), #clearBtn:hover:not(:disabled) {
+    background: #b91c1c;
+}
+.del-btn:active:not(:disabled), #clearBtn:active:not(:disabled) {
+    background: #991b1b;
+}
+.tp-btn, #saveBtn {
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+}
+.tp-btn:hover:not(:disabled), #saveBtn:hover:not(:disabled) {
+    background: #1e40af;
+}
+.tp-btn:active:not(:disabled), #saveBtn:active:not(:disabled) {
+    background: #1e293b;
+}
+#status-bar { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; z-index: 3001; }
+#coords-bar { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-family: monospace; z-index: 10; }
+#minimap-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 200px;
+    height: 200px;
+    background: rgba(0,0,0,0.8);
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    z-index: 10;
+}
+#minimap-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+}
+.minimap-controls { position: absolute; bottom: 5px; left: 5px; right: 5px; display: flex; justify-content: space-between; }
+.minimap-btn, .mobile-btn, #toggleControlsBtn, #fullscreenBtn {
+    background: #f3f4f6;
+    color: #374151;
+    font-weight: 500;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+}
+.minimap-btn:hover:not(:disabled), .mobile-btn:hover:not(:disabled), #toggleControlsBtn:hover:not(:disabled), #fullscreenBtn:hover:not(:disabled) {
+    background: #e5e7eb;
+    color: #1e293b;
+}
+.minimap-btn:active:not(:disabled), .mobile-btn:active:not(:disabled), #toggleControlsBtn:active:not(:disabled), #fullscreenBtn:active:not(:disabled) {
+    background: #d1d5db;
+}
+.edit-mode-controls button { padding: 4px 8px; font-size: 0.8em; }
+
+/* Remove all mobile device feature styles */
+
+@media (max-width: 768px) {
+    #controls-panel {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        height: 100%;
+        z-index: 100;
+        transition: left 0.3s ease;
+    }
+    #controls-panel:not(.hidden) {
+        left: 0;
+    }
+    #toggleControlsBtn {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        width: auto;
+        z-index: 110;
+    }
+}
+html, body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+#container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+:fullscreen #container, :fullscreen body, :fullscreen html {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    min-width: 100vw !important;
+    overflow: hidden !important;
+}
+@media (max-width: 768px) {
+    html, body, #container {
+        width: 100vw !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        min-width: 100vw !important;
+        overflow: hidden !important;
+    }
+}
+@media (max-width: 600px) {
+    #minimap-container {
+        width: 100px !important;
+        height: 100px !important;
+    }
+    #edit-float-panel {
+        left: 0;
+        top: 120px;
+        transform: none;
+    }
+}
+#edit-float-panel {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 12px 8px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+}
+#edit-float-panel button {
+    margin: 4px 0;
+    min-width: 90px;
+    font-size: 1em;
+    color: rgb(0, 0, 0);
+}
+.edit-mode-controls-float {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+@media (max-width: 768px) {
+    #edit-float-panel {
+        left: 0;
+        top: 60%;
+        padding: 8px 4px;
+    }
+    #edit-float-panel button {
+        min-width: 70px;
+        font-size: 0.95em;
+    }
+}
+#editModeCycleBtnFloat {
+    margin: 4px 0;
+    min-width: 90px;
+    font-size: 1em;
+}
+/* ========= NEW: Coordinate Editor Panel Styles ========== */
+.coords-panel {
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fafafa;
+}
+.coords-panel label {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+.coords-panel input {
+    width: 70px;
+    margin: 2px 5px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+/* ========================================================= */

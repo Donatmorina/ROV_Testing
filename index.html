@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ROV Path Planner - Stable Core</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <div id="controls-panel">
+            <button id="fullscreenBtn" style="width:100%;margin-bottom:10px;">Full Screen</button>
+            <button id="toggleControlsBtn" style="width:100%;margin-bottom:10px;">Hide/Show Menu</button>
+            <h3>ROV Controls</h3>
+            <div class="control-group">
+                <h4 class="collapsible">Flight Recorder</h4>
+                <div class="collapsible-content">
+                    <button id="recordBtn">Record</button>
+                    <button id="stopBtn" disabled>Stop</button>
+                    <button id="playBtn" disabled>Play</button>
+                    <button id="playBackwardsBtn" disabled>Play Backwards</button>
+                    <button id="resumeFromBtn" disabled>Resume From</button>
+                    <select id="resumeFromDropdown" style="display:none;"></select>
+                    <button id="editPathBtn" disabled>Edit Path</button>
+
+                    <!-- Gizmo Mode Button -->
+                    <button id="gizmoModeBtn" style="margin:8px 0;">Switch Gizmo Mode (Move/Rotate)</button>
+
+                    <!-- Rotate Path Button -->
+                    <button id="rotatePathBtn" style="margin:8px 0;">Rotate Path</button>
+
+                    <!-- Path Rotation Panel -->
+                    <div id="pathRotatePanel" class="coords-panel" style="display:none;">
+                        <label>Rot X:</label><input type="number" step="1" id="pathRotX" style="width:60px;">
+                        <label>Y:</label><input type="number" step="1" id="pathRotY" style="width:60px;">
+                        <label>Z:</label><input type="number" step="1" id="pathRotZ" style="width:60px;">
+                        <div style="margin-top:6px;">
+                            <button id="pathRotLeft">&#8592; Y-</button>
+                            <button id="pathRotRight">Y+ &#8594;</button>
+                            <button id="pathRotUp">&#8593; X-</button>
+                            <button id="pathRotDown">X+ &#8595;</button>
+                            <button id="pathRotZp">Z+</button>
+                            <button id="pathRotZm">Z-</button>
+                            <button id="pathRotReset" style="margin-left:10px;">Reset</button>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label style="display:block;">X Axis:</label>
+                            <input type="range" id="pathRotXSlider" min="-180" max="180" step="1" style="width:90%;">
+                            <label style="display:block;">Y Axis:</label>
+                            <input type="range" id="pathRotYSlider" min="-180" max="180" step="1" style="width:90%;">
+                            <label style="display:block;">Z Axis:</label>
+                            <input type="range" id="pathRotZSlider" min="-180" max="180" step="1" style="width:90%;">
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label for="rotationOriginSelect" style="display:block;">Rotation Origin:</label>
+                            <select id="rotationOriginSelect" style="width:100%;"></select>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label for="playbackSpeed" style="display: block; margin-bottom: 5px; font-size: 0.9em;">Playback Speed:</label>
+                        <input type="range" id="playbackSpeed" min="0.001" max="1.0" step="0.001" value="0.05" style="width: 100%;">
+                        <span id="speedValue" style="font-size: 0.8em; color: #666;">0.05x</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <h4 class="collapsible">ROV Speed</h4>
+                <div class="collapsible-content">
+                    <div style="margin-top: 10px;">
+                        <label for="rovSpeed" style="display: block; margin-bottom: 5px; font-size: 0.9em;">Movement Speed:</label>
+                        <input type="range" id="rovSpeed" min="0.1" max="20" step="0.1" value="1" style="width: 100%;">
+                        <span id="rovSpeedValue" style="font-size: 0.8em; color: #666;">1.0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <h4 class="collapsible">Camera</h4>
+                <div class="collapsible-content">
+                    <button id="switchViewBtn">Switch to POV</button>
+                    <button id="freeViewBtn">Free View</button>
+                    <p style="font-size:0.8em; color:#666;">Use mouse to orbit/pan/zoom.</p>
+                </div>
+            </div>
+            <div class="control-group">
+                <h4 class="collapsible">Data</h4>
+                <div class="collapsible-content">
+                    <button id="undoBtn" disabled>Undo</button>
+                    <button id="redoBtn" disabled>Redo</button>
+                    <button id="saveBtn" disabled>Save Path</button>
+                    <button id="loadBtn">Load Path</button>
+                    <button id="clearBtn">Clear All</button>
+                    <input type="file" id="loadInput" style="display:none;" accept=".json"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <h4 class="collapsible">Waypoints</h4>
+                <div class="collapsible-content">
+                    <button id="deleteSelectedWaypointsBtn" disabled>Delete Selected</button>
+                    <button id="cycleWaypointsBtn" disabled>Cycle Waypoints</button>
+                    <div class="teleport-container" style="display: inline-block;">
+                        <button id="teleportBtn" disabled>Teleport</button>
+                        <select id="teleport-dropdown" style="display: none;"></select>
+                    </div>
+                    <button id="editPathCoordsBtn" style="margin-top:8px; display:none; padding:8px 6px;">Edit Path Position</button>
+                    <div id="pathCoordsPanel" class="coords-panel" style="display:none;">
+                        <label for="pathCoordX">X:</label>
+                        <input type="number" step="0.1" id="pathCoordX">
+                        <label for="pathCoordY">Y:</label>
+                        <input type="number" step="0.1" id="pathCoordY">
+                        <label for="pathCoordZ">Z:</label>
+                        <input type="number" step="0.1" id="pathCoordZ">
+                    </div>
+                    <div id="waypoint-list" class="list-container">None</div>
+                    <div id="proportional-edit-controls" style="display:none; margin-top: 10px;">
+                        <div class="edit-mode-controls" style="margin-top: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 0.9em; margin-right: 5px;">Move Axis:</span>
+                            <button id="editModeFreeBtn" class="active">Free</button>
+                            <button id="editModeHorizontalBtn">Horizontal</button>
+                            <button id="editModeVerticalBtn">Vertical</button>
+                        </div>
+                        <div id="extend-path-controls" style="margin-bottom: 10px; display: none;">
+                            <button id="extendPathBtn">Extend Path</button>
+                            <select id="extendPathMode">
+                                <option value="horizontal">Horizontal</option>
+                                <option value="vertical">Vertical</option>
+                            </select>
+                        </div>
+                        <label for="editFalloff" style="display: block; margin-bottom: 5px; font-size: 0.9em;">Edit Falloff:</label>
+                        <input type="range" id="editFalloff" min="0" max="50" step="1" value="10" style="width: 100%;">
+                        <span id="editFalloffValue" style="font-size: 0.8em; color: #666;">10.0</span>
+                        <label for="pathEditSpeed" style="display: block; margin-top: 10px; margin-bottom: 5px; font-size: 0.9em;">Path Edit Speed:</label>
+                        <input type="range" id="pathEditSpeed" min="1" max="50" step="1" value="8" style="width: 100%;">
+                        <span id="pathEditSpeedValue" style="font-size: 0.8em; color: #666;">8.0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <h4 class="collapsible">Minimap</h4>
+                <div class="collapsible-content">
+                    <button id="minimapToggleMenuBtn">Hide Minimap</button>
+                </div>
+            </div>
+        </div>
+        <div id="scene-container">
+            <div id="status-bar">Ready</div>
+            <div id="coords-bar">X: 0.0, Y: 0.0, Z: 0.0</div>
+            <div id="minimap-container">
+                <canvas id="minimap-canvas"></canvas>
+                <div class="minimap-controls">
+                    <button class="minimap-btn" id="minimap-follow">Follow</button>
+                    <button class="minimap-btn" id="fpvToggleMenuBtn">Show FPV</button>
+                </div>
+            </div>
+            <div id="fpv-container" style="position:absolute; top:10px; left:220px; width:200px; height:200px; background:rgba(0,0,0,0.8); border:2px solid #ccc; border-radius:8px; z-index:10; display:none;">
+                <canvas id="fpv-canvas"></canvas>
+                <div class="minimap-controls">
+                    <button class="minimap-btn" id="fpvHideBtn">Hide FPV</button>
+                    <button class="minimap-btn" id="fpvSwitchMainBtn">Switch to Main View</button>
+                </div>
+            </div>
+        </div>
+        <div id="edit-float-panel" style="display:none;">
+            <button id="editPathBtnFloat">Edit Path</button>
+            <button id="editModeCycleBtnFloat">Axis: Free</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/delaunator@5.0.0/delaunator.min.js"></script>
+
+    <script type="importmap">
+        { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/" } }
+    </script>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
